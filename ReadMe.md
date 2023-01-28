@@ -1,4 +1,4 @@
-# [Assignment Name Goes Here] 
+# HW1 
 
 *Delete the italicized text before submitting*
 
@@ -9,7 +9,7 @@
 *You should make the edits to this readme in your IDE, not on the GitHub website*
 
 * author0 name - netid
-* author1 name - netid
+* Christopher Joseph - tbh7cm
 * author2 name - netid
 
 ## Description
