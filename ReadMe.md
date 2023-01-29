@@ -8,7 +8,7 @@
 
 *You should make the edits to this readme in your IDE, not on the GitHub website*
 
-* author0 name - netid
+* Pranav Ramkumar - vej8jz
 * Christopher Joseph - tbh7cm
 * author2 name - netid
 
