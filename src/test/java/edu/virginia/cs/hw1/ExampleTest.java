@@ -23,7 +23,7 @@ public class ExampleTest {
     int totalPop = 0;  //this will be the total population of the US.
     int statePop = 0; //this will be the total population of each state.
     //create a "dictionary" using HashTable for each state with a temporary value assigned to each key (0)
-    int totalRep = 0; //TODO: Change 0 to take in user input, as well as take in a file to read state populations.
+    int totalRep = 1; //TODO: Change 0 to take in user input, as well as take in a file to read state populations.
     Hashtable<String, Integer> my_dict = new Hashtable<String, Integer>();
     //for (every state in csv list) {
     //  totalPop += statePop
