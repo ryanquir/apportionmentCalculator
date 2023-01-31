@@ -10,7 +10,7 @@
 
 * Pranav Ramkumar - vej8jz
 * Christopher Joseph - tbh7cm
-* author2 name - netid
+* Ryan Quiram - zhe5qq
 
 ## Description
 
