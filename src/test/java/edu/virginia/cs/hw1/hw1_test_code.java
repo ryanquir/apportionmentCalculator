@@ -3,7 +3,7 @@ package edu.virginia.cs.hw1;
 //imported Hashtables to use for a "dictionary"
 import java.util.Hashtable;
 
-public class hw1_test {
+public class hw1_test_code {
     public static void main(String[] args) {
         int totalPop = 0;  //this will be the total population of the US.
         int statePop = 0; //this will be the total population of each state.
