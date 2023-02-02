@@ -1,12 +1,6 @@
-# HW1 
-
-*Delete the italicized text before submitting*
+# HW1
 
 ## Authors
-
-*Each author should add their own name, and *only* their own name via commit and push.*
-
-*You should make the edits to this readme in your IDE, not on the GitHub website*
 
 * Pranav Ramkumar - vej8jz
 * Christopher Joseph - tbh7cm
@@ -23,8 +17,3 @@ In order to run this program on a local environment, the following steps must be
    * Via IntelliJ: Go to "File>New>Project From Version Control" and enter the link into the URL field
  * In any terminal, enter the directory, and enter "./gradlew build" to enable automated building in this local directory
  * To run the program, run Apportionment.jar, which is found in "./build/libs/"
-
-*Add a description of how to build and run your program here*
-
-*Your instruction should include steps for cloning the repository and building using gradle*
-
