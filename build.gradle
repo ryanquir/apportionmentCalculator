@@ -5,7 +5,7 @@ plugins {
 jar {
     archiveBaseName = "Apportionment"
     manifest {
-        attributes "Main-Class": "edu.virginia.cs.hw1"
+        attributes "Main-Class": "edu.virginia.cs.hw1.Main"
     }
 
     duplicatesStrategy = DuplicatesStrategy.EXCLUDE
