@@ -66,9 +66,9 @@ public class Main {
         //  totalPop += statePop
         //  my_dict.put(state, statePop);
         //}
-        float avgPopRep = totalPop / totalRep;
-        int allocatedReps = 0; //create a variable to keep track of how many reps we allocated.
-        float repDivision = 0; // a variable to keep track of the result of state population / average population per rep.
+        //float avgPopRep = totalPop / totalRep;
+        //int allocatedReps = 0; //create a variable to keep track of how many reps we allocated.
+        //float repDivision = 0; // a variable to keep track of the result of state population / average population per rep.
         //for (each state in state_list) {
         //  repDivision = my_dict.get(state) / avgPopRep
         //}
