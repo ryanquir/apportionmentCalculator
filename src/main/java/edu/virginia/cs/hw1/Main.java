@@ -14,6 +14,7 @@ import java.util.ArrayList;
 import java.util.Hashtable;
 import java.util.List;
 import java.util.Locale;
+import java.lang.Integer;
 
 public class Main {
     public static void main(String[] args) {
@@ -24,6 +25,16 @@ public class Main {
         BufferedReader readFile;
         try {
             String fileName = args[0];
+            int totalRep;
+            if (args.length > 1) {
+                totalRep = Integer.parseInt(args[1]);
+                if (totalRep < 0) {
+                    throw new NumberFormatException();
+                }
+            }
+            else {
+                totalRep = 435;
+            }
             FileReader file = new FileReader(fileName);
             readFile = new BufferedReader(file);
             CSVParser parsedFile = CSVFormat.DEFAULT.withHeader().parse(readFile);
@@ -76,6 +87,8 @@ public class Main {
             //}
         } catch (IndexOutOfBoundsException e) {
             throw new RuntimeException("No argument inputted");
+        } catch (NumberFormatException e) {
+            throw new RuntimeException("Not a valid number");
         } catch (FileNotFoundException e) {
             throw new RuntimeException("File does not exist");
         } catch (IOException e) {
