@@ -19,6 +19,8 @@ public class Main {
     public static void main(String[] args) {
 //        System.out.println("Make sure you updated the build.gradle " +
 //                "file to point to the right main class");
+        //-------------------------------------------------------------
+        //making an input to read csv file
         BufferedReader readFile;
         try {
             String fileName = args[0];
@@ -34,6 +36,7 @@ public class Main {
                 }
             }
             //-------------------------------------------------------------
+            //making a temporary list into a Hash Table.
             for (int i=0;i< temporary.size()-1;i+=2) {
                 //for every other value in the temporary list, add the state and its population to a dictionary.
                 state_list.put(temporary.get(i), NumberFormat.getNumberInstance(Locale.US).parse(temporary.get(i+1)).intValue());
@@ -44,12 +47,33 @@ public class Main {
             //System.out.println(state_list.size()); Size of the dictionary. Should be 51 for each state + DC.
 
             // Found help at : https://www.geeksforgeeks.org/how-to-iterate-through-hashtable-in-java/
-            for (String key : state_list.keySet()) {
-                // this for-loop displays all states and their respective population (in integer format)
-                System.out.println(key
-                        + "\t\t"
-                        + state_list.get(key));
+//            for (String key : state_list.keySet()) {
+//                // this for-loop displays all states and their respective population (in integer format)
+//                System.out.println(key
+//                        + "\t\t"
+//                        + state_list.get(key));
+//            }
+            //-------------------------------------------------------------
+            //TODO: Create Hamilton's algorithm using the created HashTable "state_list". Psuedocode below.
+            int totalpop = 0;
+            for (String state : state_list.keySet()) {
+                // this for loop adds all the populations from each state to make a total population.
+                totalpop += state_list.get(state);
             }
+            //float avgPopRep = totalPop / totalRep;
+            //int allocatedReps = 0; //create a variable to keep track of how many reps we allocated.
+            //float repDivision = 0; // a variable to keep track of the result of state population / average population per rep.
+            //for (each state in state_list) {
+            //  repDivision = my_dict.get(state) / avgPopRep
+            //}
+            // need to figure out how to floor the repDivision and keep the decimal remainder for later comparison
+            //  my_dict.put(state, "flooredRepDivision");
+            //  allocatedReps += "flooredRepDivision"
+            //}
+            // once we've finished allocations for every state...
+            // for ("totalRep - allocatedRep" amount of times) {
+            //  find largest remainder, give 1 rep to the corresponding state, then move to next largest remainder.
+            //}
         } catch (IndexOutOfBoundsException e) {
             throw new RuntimeException("No argument inputted");
         } catch (FileNotFoundException e) {
@@ -61,24 +85,5 @@ public class Main {
             // Parse exception for debugging and error avoidance.
         }
         //-------------------------------------------------------------
-        //TODO: Create Hamilton's algorithm using the created HashTable "state_list"
-        //for (every state in csv list) {
-        //  totalPop += statePop
-        //  my_dict.put(state, statePop);
-        //}
-        //float avgPopRep = totalPop / totalRep;
-        //int allocatedReps = 0; //create a variable to keep track of how many reps we allocated.
-        //float repDivision = 0; // a variable to keep track of the result of state population / average population per rep.
-        //for (each state in state_list) {
-        //  repDivision = my_dict.get(state) / avgPopRep
-        //}
-        // need to figure out how to floor the repDivision and keep the decimal remainder for later comparison
-        //  my_dict.put(state, "flooredRepDivision");
-        //  allocatedReps += "flooredRepDivision"
-        //}
-        // once we've finished allocations for every state...
-        // for ("totalRep - allocatedRep" amount of times) {
-        //  find largest remainder, give 1 rep to the corresponding state, then move to next largest remainder.
-        //}
     }
 }
