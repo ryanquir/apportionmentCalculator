@@ -11,6 +11,7 @@ import java.io.IOException;
 import java.text.NumberFormat;
 import java.text.ParseException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Hashtable;
 import java.util.List;
 import java.util.Locale;
@@ -40,6 +41,7 @@ public class Main {
             CSVParser parsedFile = CSVFormat.DEFAULT.withHeader().parse(readFile);
             List<String> temporary = new ArrayList<String>();
             Hashtable<String, Integer> state_list = new Hashtable<String, Integer>();
+            Hashtable<Float, String> remainder_list = new Hashtable<Float, String>();
             for (CSVRecord record : parsedFile) {
                 for (String field : record) {
                     //made a list of states and their values next to each other.
@@ -51,6 +53,7 @@ public class Main {
             for (int i=0;i< temporary.size()-1;i+=2) {
                 //for every other value in the temporary list, add the state and its population to a dictionary.
                 state_list.put(temporary.get(i), NumberFormat.getNumberInstance(Locale.US).parse(temporary.get(i+1)).intValue());
+                remainder_list.put((float) 0, temporary.get(i));
             }
             //System.out.println(temporary); List of all states next to their respective populations
             //System.out.println(temporary.size()); Size of list. Should be 102 since there are 50 states + DC, times 2.
@@ -65,26 +68,29 @@ public class Main {
 //                        + state_list.get(key));
 //            }
             //-------------------------------------------------------------
-            //TODO: Create Hamilton's algorithm using the created HashTable "state_list". Psuedocode below.
-            int totalpop = 0;
+            int totalPop = 0;
             for (String state : state_list.keySet()) {
                 // this for loop adds all the populations from each state to make a total population.
-                totalpop += state_list.get(state);
+                totalPop += state_list.get(state);
             }
-            //float avgPopRep = totalPop / totalRep;
-            //int allocatedReps = 0; //create a variable to keep track of how many reps we allocated.
-            //float repDivision = 0; // a variable to keep track of the result of state population / average population per rep.
-            //for (each state in state_list) {
-            //  repDivision = my_dict.get(state) / avgPopRep
-            //}
-            // need to figure out how to floor the repDivision and keep the decimal remainder for later comparison
-            //  my_dict.put(state, "flooredRepDivision");
-            //  allocatedReps += "flooredRepDivision"
-            //}
+            float avgPopRep = totalPop / totalRep;
+            int allocatedRep = 0; //create a variable to keep track of how many reps we allocated.
+            float repDivision = 0; // a variable to keep track of the result of state population / average population per rep.
+            int flooredRepDivision = 0;
+            for (String state : state_list.keySet()) {
+              repDivision = state_list.get(state) / avgPopRep;
+              flooredRepDivision = (int) Math.floor(repDivision);
+              remainder_list.put(repDivision - flooredRepDivision, state);
+              state_list.put(state, flooredRepDivision);
+              allocatedRep += flooredRepDivision;
+            }
             // once we've finished allocations for every state...
-            // for ("totalRep - allocatedRep" amount of times) {
+            while (totalRep > allocatedRep) {
             //  find largest remainder, give 1 rep to the corresponding state, then move to next largest remainder.
-            //}
+                state_list.put(remainder_list.get(Collections.max(remainder_list.keySet())), state_list.get(remainder_list.get(Collections.max(remainder_list.keySet())))+1);
+                remainder_list.remove(Collections.max(remainder_list.keySet()));
+                allocatedRep++;
+            }
         } catch (IndexOutOfBoundsException e) {
             throw new RuntimeException("No argument inputted");
         } catch (NumberFormatException e) {
