@@ -40,9 +40,9 @@ public class Main {
             FileReader file = new FileReader(fileName);
             readFile = new BufferedReader(file);
             CSVParser parsedFile = CSVFormat.DEFAULT.withHeader().parse(readFile);
-            List<String> temporary = new ArrayList<String>();
-            Hashtable<String, Integer> state_list = new Hashtable<String, Integer>();
-            Hashtable<String, Float> remainder_list = new Hashtable<String, Float>();
+            List<String> temporary = new ArrayList<>();
+            Hashtable<String, Integer> state_list = new Hashtable<>();
+            Hashtable<String, Float> remainder_list = new Hashtable<>();
             for (CSVRecord record : parsedFile) {
                 for (String field : record) {
                     //made a list of states and their values next to each other.
@@ -71,8 +71,8 @@ public class Main {
             }
             float avgPopRep = totalPop / totalRep; //population per representative
             int allocatedRep = 0; //a variable to keep track of how many reps we allocated.
-            float repDivision = 0; //a variable to keep track of the result of state population / average population per rep.
-            int flooredRepDivision = 0; //
+            float repDivision; //a variable to keep track of the result of state population / average population per rep.
+            int flooredRepDivision; //
             for (String state : state_list.keySet()) {
                 repDivision = ((float) state_list.get(state)) / avgPopRep;
                 flooredRepDivision = (int) Math.floor(repDivision);
