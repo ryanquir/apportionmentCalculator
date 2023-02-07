@@ -40,7 +40,7 @@ public class Main {
             FileReader file = new FileReader(fileName);
             readFile = new BufferedReader(file);
             CSVParser parsedFile = CSVFormat.DEFAULT.withHeader().parse(readFile);
-            List<String> temporary = new ArrayList<>();
+//            List<String> temporary = new ArrayList<>();
             Hashtable<String, Integer> state_list = new Hashtable<>();
             Hashtable<String, Float> remainder_list = new Hashtable<>();
             float tempVal;
