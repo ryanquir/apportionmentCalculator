@@ -49,6 +49,7 @@ public class Main {
                     temporary.add(field);
                 }
             }
+            //CSV reading functions and loop taken from apache commons java docs: https://javadoc.io/doc/org.apache.commons/commons-csv/latest/index.html
             //-------------------------------------------------------------
             //making a temporary list into a Hash Table.
             for (int i=0;i< temporary.size()-1;i+=2) {
