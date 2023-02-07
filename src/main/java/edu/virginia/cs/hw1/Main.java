@@ -91,11 +91,13 @@ public class Main {
                     }
                 }
             }
-            for (String key : state_list.keySet()) {
+            //found help at https://docs.oracle.com/javase/7/docs/api/java/util/Collections.html
+            List<String> states = new ArrayList<>(state_list.keySet());
+            Collections.sort(states);
+            //used collections to alphabetize a list of states
+            for (String state : states) {
                 //this for-loop displays all states and their respective values (in integer format)
-                System.out.println(key
-                        + "\t\t"
-                        + state_list.get(key));
+                System.out.println(state + " - " + state_list.get(state));
             }
         } catch (IndexOutOfBoundsException e) {
             throw new RuntimeException("No argument inputted");
