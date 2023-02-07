@@ -19,8 +19,8 @@ import java.lang.Integer;
 
 public class Main {
     public static void main(String[] args) {
-//        System.out.println("Make sure you updated the build.gradle " +
-//                "file to point to the right main class");
+//  "Make sure you updated the build.gradle " +
+//  "file to point to the right main class");
         //-------------------------------------------------------------
         //making an input to read csv file
         BufferedReader readFile;
@@ -34,6 +34,7 @@ public class Main {
                 }
             }
             else {
+                //435 is the default representatives value
                 totalRep = 435;
             }
             FileReader file = new FileReader(fileName);
@@ -41,7 +42,7 @@ public class Main {
             CSVParser parsedFile = CSVFormat.DEFAULT.withHeader().parse(readFile);
             List<String> temporary = new ArrayList<String>();
             Hashtable<String, Integer> state_list = new Hashtable<String, Integer>();
-            Hashtable<Float, String> remainder_list = new Hashtable<Float, String>();
+            Hashtable<String, Float> remainder_list = new Hashtable<String, Float>();
             for (CSVRecord record : parsedFile) {
                 for (String field : record) {
                     //made a list of states and their values next to each other.
@@ -53,44 +54,51 @@ public class Main {
             for (int i=0;i< temporary.size()-1;i+=2) {
                 //for every other value in the temporary list, add the state and its population to a dictionary.
                 state_list.put(temporary.get(i), NumberFormat.getNumberInstance(Locale.US).parse(temporary.get(i+1)).intValue());
-                remainder_list.put((float) 0, temporary.get(i));
+                //separate list for states and remainders
+                remainder_list.put(temporary.get(i), (float) 0);
             }
+            //Found help at : https://www.geeksforgeeks.org/how-to-iterate-through-hashtable-in-java/
             //System.out.println(temporary); List of all states next to their respective populations
             //System.out.println(temporary.size()); Size of list. Should be 102 since there are 50 states + DC, times 2.
             //System.out.println(state_list); Hashtable dictionary (non-alphabetical, somehow) of all states paired with their respective populations.
             //System.out.println(state_list.size()); Size of the dictionary. Should be 51 for each state + DC.
-
-            // Found help at : https://www.geeksforgeeks.org/how-to-iterate-through-hashtable-in-java/
-//            for (String key : state_list.keySet()) {
-//                // this for-loop displays all states and their respective population (in integer format)
-//                System.out.println(key
-//                        + "\t\t"
-//                        + state_list.get(key));
-//            }
             //-------------------------------------------------------------
-            int totalPop = 0;
+            int totalPop = 0; //a variable to store the total population of all states
             for (String state : state_list.keySet()) {
                 // this for loop adds all the populations from each state to make a total population.
                 totalPop += state_list.get(state);
             }
-            float avgPopRep = totalPop / totalRep;
-            int allocatedRep = 0; //create a variable to keep track of how many reps we allocated.
-            float repDivision = 0; // a variable to keep track of the result of state population / average population per rep.
-            int flooredRepDivision = 0;
+            float avgPopRep = totalPop / totalRep; //population per representative
+            int allocatedRep = 0; //a variable to keep track of how many reps we allocated.
+            float repDivision = 0; //a variable to keep track of the result of state population / average population per rep.
+            int flooredRepDivision = 0; //
             for (String state : state_list.keySet()) {
-              repDivision = state_list.get(state) / avgPopRep;
-              flooredRepDivision = (int) Math.floor(repDivision);
-              remainder_list.put(repDivision - flooredRepDivision, state);
-              state_list.put(state, flooredRepDivision);
-              allocatedRep += flooredRepDivision;
+                repDivision = ((float) state_list.get(state)) / avgPopRep;
+                flooredRepDivision = (int) Math.floor(repDivision);
+                remainder_list.put(state, repDivision - flooredRepDivision);
+                state_list.put(state, flooredRepDivision);
+                allocatedRep += flooredRepDivision;
             }
-            // once we've finished allocations for every state...
+            //once we've finished allocations for every state...
             while (totalRep > allocatedRep) {
-            //  find largest remainder, give 1 rep to the corresponding state, then move to next largest remainder.
-                state_list.put(remainder_list.get(Collections.max(remainder_list.keySet())), state_list.get(remainder_list.get(Collections.max(remainder_list.keySet())))+1);
-                remainder_list.remove(Collections.max(remainder_list.keySet()));
-                allocatedRep++;
+            //find the largest remainder, give 1 rep to the corresponding state, repeat until out of reps
+                for (String state : state_list.keySet()) {
+                    if(Collections.max(remainder_list.values()) == remainder_list.get(state)) {
+                        allocatedRep++;
+                        state_list.put(state, state_list.get(state)+1);
+                        remainder_list.remove(state);
+                    }
+                }
             }
+            int x = 0;
+            for (String key : state_list.keySet()) {
+               //this for-loop displays all states and their respective values (in integer format)
+                System.out.println(key
+                        + "\t\t"
+                        + state_list.get(key));
+                  x+=state_list.get(key);
+            }
+            System.out.println(x);
         } catch (IndexOutOfBoundsException e) {
             throw new RuntimeException("No argument inputted");
         } catch (NumberFormatException e) {
