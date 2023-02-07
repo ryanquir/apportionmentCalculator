@@ -43,21 +43,31 @@ public class Main {
             List<String> temporary = new ArrayList<>();
             Hashtable<String, Integer> state_list = new Hashtable<>();
             Hashtable<String, Float> remainder_list = new Hashtable<>();
+            float tempVal;
+            int tempInt;
             for (CSVRecord record : parsedFile) {
-                for (String field : record) {
-                    //made a list of states and their values next to each other.
-                    temporary.add(field);
+                if (record.size() >= 2) {
+                    tempVal = NumberFormat.getNumberInstance(Locale.US).parse(record.values()[1]).floatValue();
+                    tempInt = (int)tempVal;
+                    if (tempVal-tempInt == 0 && tempVal >= 0) {
+                        state_list.put(record.values()[0], tempInt);
+                        remainder_list.put(record.values()[0], (float) 0);
+                    }
                 }
+//                for (String field : record) {
+//                    //made a list of states and their values next to each other.
+//                    temporary.add(field);
+//                }
             }
             //CSV reading functions and loop taken from apache commons java docs: https://javadoc.io/doc/org.apache.commons/commons-csv/latest/index.html
             //-------------------------------------------------------------
             //making a temporary list into a Hash Table.
-            for (int i=0;i< temporary.size()-1;i+=2) {
-                //for every other value in the temporary list, add the state and its population to a dictionary.
-                state_list.put(temporary.get(i), NumberFormat.getNumberInstance(Locale.US).parse(temporary.get(i+1)).intValue());
-                //separate list for states and remainders
-                remainder_list.put(temporary.get(i), (float) 0);
-            }
+//            for (int i=0;i< temporary.size()-1;i+=2) {
+//                //for every other value in the temporary list, add the state and its population to a dictionary.
+//                state_list.put(temporary.get(i), NumberFormat.getNumberInstance(Locale.US).parse(temporary.get(i+1)).intValue());
+//                //separate list for states and remainders
+//                remainder_list.put(temporary.get(i), (float) 0);
+//            }
             //Found help at : https://www.geeksforgeeks.org/how-to-iterate-through-hashtable-in-java/
             //System.out.println(temporary); List of all states next to their respective populations
             //System.out.println(temporary.size()); Size of list. Should be 102 since there are 50 states + DC, times 2.
@@ -109,7 +119,7 @@ public class Main {
         } catch (IOException e) {
             throw new RuntimeException("Cannot read file");
         } catch (ParseException e) {
-            throw new RuntimeException(e);
+            throw new RuntimeException("Invalid value in file; Cannot be parsed");
             // Parse exception for debugging and error avoidance.
         }
         //-------------------------------------------------------------
