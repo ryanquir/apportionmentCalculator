@@ -81,24 +81,22 @@ public class Main {
             }
             //once we've finished allocations for every state...
             while (totalRep > allocatedRep) {
-            //find the largest remainder, give 1 rep to the corresponding state, repeat until out of reps
+                //find the largest remainder, give 1 rep to the corresponding state, repeat until out of reps
                 for (String state : state_list.keySet()) {
-                    if(Collections.max(remainder_list.values()) == remainder_list.get(state)) {
+                    if (Collections.max(remainder_list.values()) == remainder_list.get(state)) {
                         allocatedRep++;
-                        state_list.put(state, state_list.get(state)+1);
+                        state_list.put(state, state_list.get(state) + 1);
                         remainder_list.remove(state);
+                        break;
                     }
                 }
             }
-            int x = 0;
             for (String key : state_list.keySet()) {
-               //this for-loop displays all states and their respective values (in integer format)
+                //this for-loop displays all states and their respective values (in integer format)
                 System.out.println(key
                         + "\t\t"
                         + state_list.get(key));
-                  x+=state_list.get(key);
             }
-            System.out.println(x);
         } catch (IndexOutOfBoundsException e) {
             throw new RuntimeException("No argument inputted");
         } catch (NumberFormatException e) {
