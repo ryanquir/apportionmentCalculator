@@ -16,4 +16,6 @@ In order to run this program on a local environment, the following steps must be
    * Via CLI: Use "git init" followed by the "git clone 'link'" command on the desired directory
    * Via IntelliJ: Go to "File>New>Project From Version Control" and enter the link into the URL field
  * In any terminal, enter the directory, and enter "./gradlew build" to enable automated building in this local directory
- * To run the program, run Apportionment.jar, which is found in "./build/libs/"
+ * To run the program, run Apportionment.jar, which is found in "./build/libs/", with a csv file and optional representative number parameter using the following command:
+
+ "java -jar build/libs/Apportionment.jar Data/2020census.csv 1000"
