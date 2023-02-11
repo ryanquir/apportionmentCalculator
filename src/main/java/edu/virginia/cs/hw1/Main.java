@@ -68,11 +68,6 @@ public class Main {
 //                //separate list for states and remainders
 //                remainder_list.put(temporary.get(i), (float) 0);
 //            }
-            //Found help at : https://www.geeksforgeeks.org/how-to-iterate-through-hashtable-in-java/
-            //System.out.println(temporary); List of all states next to their respective populations
-            //System.out.println(temporary.size()); Size of list. Should be 102 since there are 50 states + DC, times 2.
-            //System.out.println(state_list); Hashtable dictionary (non-alphabetical, somehow) of all states paired with their respective populations.
-            //System.out.println(state_list.size()); Size of the dictionary. Should be 51 for each state + DC.
             //-------------------------------------------------------------
             int totalPop = 0; //a variable to store the total population of all states
             for (String state : state_list.keySet()) {
