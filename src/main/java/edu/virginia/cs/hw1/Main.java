@@ -3,11 +3,14 @@ package edu.virginia.cs.hw1;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVParser;
 import org.apache.commons.csv.CSVRecord;
+import org.apache.poi.hssf.usermodel.HSSFWorkbook;
+import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
+import org.apache.poi.ss.usermodel.Row;
+import org.apache.poi.ss.usermodel.Sheet;
+import org.apache.poi.ss.usermodel.Workbook;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
-import java.io.BufferedReader;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
-import java.io.IOException;
+import java.io.*;
 import java.text.NumberFormat;
 import java.text.ParseException;
 import java.util.ArrayList;
@@ -37,28 +40,45 @@ public class Main {
                 //435 is the default representatives value
                 totalRep = 435;
             }
-            FileReader file = new FileReader(fileName);
-            readFile = new BufferedReader(file);
-            CSVParser parsedFile = CSVFormat.DEFAULT.withHeader().parse(readFile);
-//            List<String> temporary = new ArrayList<>();
             Hashtable<String, Integer> state_list = new Hashtable<>();
             Hashtable<String, Float> remainder_list = new Hashtable<>();
+            Sheet sheet;
             float tempVal;
             int tempInt;
-            for (CSVRecord record : parsedFile) {
-                if (record.size() >= 2) {
-                    tempVal = NumberFormat.getNumberInstance(Locale.US).parse(record.values()[1]).floatValue();
-                    tempInt = (int)tempVal;
-                    if (tempVal-tempInt == 0 && tempVal >= 0) {
-                        state_list.put(record.values()[0], tempInt);
-                        remainder_list.put(record.values()[0], (float) 0);
+            if (fileName.endsWith(".csv")) {
+                FileReader file = new FileReader(fileName);
+                readFile = new BufferedReader(file);
+                CSVParser parsedFile = CSVFormat.DEFAULT.withHeader().parse(readFile);
+                for (CSVRecord record : parsedFile) {
+                    if (record.size() >= 2) {
+                        tempVal = NumberFormat.getNumberInstance(Locale.US).parse(record.values()[1]).floatValue();
+                        tempInt = (int)tempVal;
+                        if (tempVal-tempInt == 0 && tempVal >= 0) {
+                            state_list.put(record.values()[0], tempInt);
+                            remainder_list.put(record.values()[0], (float) 0);
+                        }
                     }
-                }
 //                for (String field : record) {
 //                    //made a list of states and their values next to each other.
 //                    temporary.add(field);
 //                }
+                }
             }
+            else {
+                sheet = getSheet(fileName);
+                sheet.removeRow(sheet.getRow(0));
+                for (Row row: sheet) {
+                    if (row.getPhysicalNumberOfCells() >= 2) {
+                        tempVal = (float)row.getCell(1).getNumericCellValue();
+                        tempInt = (int)tempVal;
+                        if (tempVal-tempInt == 0 && tempVal >= 0) {
+                            state_list.put(row.getCell(0).getStringCellValue(), tempInt);
+                            remainder_list.put(row.getCell(0).getStringCellValue(), (float) 0);
+                        }
+                    }
+                }
+            }
+//            List<String> temporary = new ArrayList<>();
             //CSV reading functions and loop taken from apache commons java docs: https://javadoc.io/doc/org.apache.commons/commons-csv/latest/index.html
             //-------------------------------------------------------------
             //making a temporary list into a Hash Table.
@@ -118,5 +138,22 @@ public class Main {
             // Parse exception for debugging and error avoidance.
         }
         //-------------------------------------------------------------
+    }
+
+
+    static Sheet getSheet(String fileName) throws IOException {
+        FileInputStream input = new FileInputStream(fileName);
+        Workbook workbook;
+        if (fileName.endsWith(".xlsx")) {
+            workbook = new XSSFWorkbook(input);
+            return workbook.getSheetAt(0);
+        }
+        else if (fileName.endsWith(".xls")) {
+            workbook = new HSSFWorkbook(input);
+            return workbook.getSheetAt(0);
+        }
+        else {
+            throw new RuntimeException("Invalid input file type");
+        }
     }
 }
