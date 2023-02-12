@@ -3,10 +3,17 @@ package edu.virginia.cs.hw1;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVParser;
 import org.apache.commons.csv.CSVRecord;
-import java.io.BufferedReader;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
-import java.io.IOException;
+import org.apache.poi.ss.usermodel.Row;
+import org.apache.poi.ss.usermodel.Sheet;
+
+import org.apache.poi.hssf.usermodel.HSSFWorkbook;
+//import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
+//import org.apache.poi.ss.usermodel.Row;
+//import org.apache.poi.ss.usermodel.Sheet;
+import org.apache.poi.ss.usermodel.Workbook;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+
+import java.io.*;
 import java.text.NumberFormat;
 import java.text.ParseException;
 import java.util.ArrayList;
@@ -17,6 +24,8 @@ import java.util.Locale;
 import java.lang.Integer;
 
 public class hw1_test_code {
+    public static Boolean hamilton = false;
+
     public static void main(String[] args) {
         //making an input to read csv file
         BufferedReader readFile;
@@ -26,29 +35,60 @@ public class hw1_test_code {
             String fileName = args[0];
             int totalRep;
             if (args.length > 1) {
-                totalRep = Integer.parseInt(args[1]);
-                if (totalRep < 0) {
-                    throw new NumberFormatException();
+                if (args[1].equals("--hamilton") && args.length == 2) {
+                    // Ex. "java -jar Apportionment.jar census2020.xlsx --hamilton"
+                    hamilton = true;
+                    totalRep = 435;
+                } else if (args.length == 3 && args[2].equals("--hamilton")) {
+                    // Ex. java -jar Apportionment.jar 2020census.xlsx 600 --hamilton
+                    hamilton = true;
+                    totalRep = Integer.parseInt(args[1]);
+                    if (totalRep < 0) {
+                        throw new NumberFormatException();
+                    }
+                } else if (args.length == 2) {
+                    // Ex. java -jar Apportionment.jar 2020census.csv 600
+                    totalRep = Integer.parseInt(args[1]);
+                    if (totalRep < 0) {
+                        throw new NumberFormatException();
+                    }
+                } else {
+                    throw new RuntimeException("Invalid arguments. Try [file, *optional* representatives, *optional* --hamilton]");
                 }
-            }
-            else {
-                //435 is the default representatives value
+            } else {
+                //435 is the default representatives value, and we use huntington-hill.
+                // Ex. java -jar Apportionment.jar 2020census.csv
                 totalRep = 435;
             }
-            FileReader file = new FileReader(fileName);
-            readFile = new BufferedReader(file);
-            CSVParser parsedFile = CSVFormat.DEFAULT.withHeader().parse(readFile);
-            //CSV reading functions and loop taken from apache commons java docs: https://javadoc.io/doc/org.apache.commons/commons-csv/latest/index.html
-            createHash(parsedFile, state_list, remainder_list);
-
-            int totalPop = 0; //a variable to store the total population of all states
+            Sheet sheet;
+            if (fileName.endsWith(".csv")) {
+                FileReader file = new FileReader(fileName);
+                readFile = new BufferedReader(file);
+                CSVParser parsedFile = CSVFormat.DEFAULT.withHeader().parse(readFile);
+                createHash_csv(parsedFile, state_list, remainder_list);
+            } else {
+                sheet = getSheet(fileName);
+                sheet.removeRow(sheet.getRow(0));
+                createHash_xlsx(state_list, remainder_list, sheet);
+            }
+            // checking if provided reps are enough to allocate,
+            if (totalRep < state_list.size()) {
+                throw new RuntimeException("Not enough representatives to allocate to each state");
+            }
+            float totalPop = 0;
             for (String state : state_list.keySet()) {
-                // this for loop adds all the populations from each state to make a total population.
+                // add all the populations -> total population.
                 totalPop += state_list.get(state);
             }
             float avgPopRep = totalPop / totalRep; //population per representative
             int allocatedRep = 0; //a variable to keep track of how many reps we allocated.
-            hamiltonMethod(state_list, remainder_list, totalRep, avgPopRep, allocatedRep);
+            if (hamilton) {
+                hamiltonMethod(state_list, remainder_list, totalRep, avgPopRep, allocatedRep);
+            } else {
+                // TODO: huntington-hill method here.
+
+            }
+
             //sorts the state_list and prints their respective representatives.
             output(state_list);
 
@@ -67,6 +107,21 @@ public class hw1_test_code {
         //-------------------------------------------------------------
     }
 
+    private static void createHash_xlsx(Hashtable<String, Integer> state_list, Hashtable<String, Float> remainder_list, Sheet sheet) {
+        float tempVal;
+        int tempInt;
+        for (Row row : sheet) {
+            if (row.getPhysicalNumberOfCells() >= 2) {
+                tempVal = (float) row.getCell(1).getNumericCellValue();
+                tempInt = (int) tempVal;
+                if (tempVal - tempInt == 0 && tempVal >= 0) {
+                    state_list.put(row.getCell(0).getStringCellValue(), tempInt);
+                    remainder_list.put(row.getCell(0).getStringCellValue(), (float) 0);
+                }
+            }
+        }
+    }
+
     private static void hamiltonMethod(Hashtable<String, Integer> state_list, Hashtable<String, Float> remainder_list, int totalRep, float avgPopRep, int allocatedRep) {
         //found help at https://docs.oracle.com/javase/7/docs/api/java/util/Collections.html
         int flooredRepDivision;
@@ -82,7 +137,7 @@ public class hw1_test_code {
         while (totalRep > allocatedRep) {
             //find the largest remainder, give 1 rep to the corresponding state, repeat until out of reps
             for (String state : state_list.keySet()) {
-                if (Collections.max(remainder_list.values()) == remainder_list.get(state)) {
+                if (Collections.max(remainder_list.values()).equals(remainder_list.get(state))) {
                     allocatedRep++;
                     state_list.put(state, state_list.get(state) + 1);
                     remainder_list.remove(state);
@@ -91,6 +146,10 @@ public class hw1_test_code {
             }
         }
     }
+
+    //private static void huntingtonHillMethod(Hashtable<String, Integer> state_list, Hashtable<String, Float> remainder_list, int totalRep, float avgPopRep, int allocatedRep) {
+
+    //}
 
     private static void output(Hashtable<String, Integer> state_list) {
         List<String> states = new ArrayList<>(state_list.keySet());
@@ -102,14 +161,28 @@ public class hw1_test_code {
         }
     }
 
-    public static void createHash(CSVParser parsedFile, Hashtable state_list, Hashtable remainder_list) throws ParseException {
+    static Sheet getSheet(String fileName) throws IOException {
+        FileInputStream input = new FileInputStream(fileName);
+        Workbook workbook;
+        if (fileName.endsWith(".xlsx")) {
+            workbook = new XSSFWorkbook(input);
+            return workbook.getSheetAt(0);
+        } else if (fileName.endsWith(".xls")) {
+            workbook = new HSSFWorkbook(input);
+            return workbook.getSheetAt(0);
+        } else {
+            throw new RuntimeException("Invalid input file type");
+        }
+    }
+
+    public static void createHash_csv(CSVParser parsedFile, Hashtable<String, Integer> state_list, Hashtable<String, Float> remainder_list) throws ParseException {
         float tempVal;
         int tempInt;
         for (CSVRecord record : parsedFile) {
             if (record.size() >= 2) {
                 tempVal = NumberFormat.getNumberInstance(Locale.US).parse(record.values()[1]).floatValue();
-                tempInt = (int)tempVal;
-                if (tempVal-tempInt == 0 && tempVal >= 0) {
+                tempInt = (int) tempVal;
+                if (tempVal - tempInt == 0 && tempVal >= 0) {
                     state_list.put(record.values()[0], tempInt);
                     remainder_list.put(record.values()[0], (float) 0);
                 }
