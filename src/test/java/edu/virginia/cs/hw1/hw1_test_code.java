@@ -53,7 +53,7 @@ public class hw1_test_code {
                         throw new NumberFormatException();
                     }
                 } else {
-                    throw new RuntimeException("Invalid arguments. Try [file, *optional* representatives, *optional* --hamilton]");
+                    throw new RuntimeException("Invalid arguments. Try [file, *optional* representatives, *optional* \"--hamilton\"]");
                 }
             } else {
                 //435 is the default representatives value, and we use huntington-hill.
