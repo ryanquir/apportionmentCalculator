@@ -31,6 +31,7 @@ public class hw1_test_code {
         BufferedReader readFile;
         Hashtable<String, Integer> state_list = new Hashtable<>();
         Hashtable<String, Float> remainder_list = new Hashtable<>();
+        Hashtable<String, Integer> reps_list = new Hashtable<>();
         try {
             String fileName = args[0];
             int totalRep;
@@ -85,7 +86,7 @@ public class hw1_test_code {
             if (hamilton) {
                 hamiltonMethod(state_list, remainder_list, totalRep, avgPopRep, allocatedRep);
             } else {
-                // TODO: huntington-hill method here.
+                huntingtonHillMethod(state_list, remainder_list, reps_list, totalRep, allocatedRep);
 
             }
 
@@ -107,7 +108,7 @@ public class hw1_test_code {
         //-------------------------------------------------------------
     }
 
-    private static void createHash_xlsx(Hashtable<String, Integer> state_list, Hashtable<String, Float> remainder_list, Sheet sheet) {
+    private static void createHash_xlsx(Hashtable<String, Integer> state_list, Hashtable<String, Float> remainder_list, Hashtable<String, Integer> reps_list, Sheet sheet) {
         float tempVal;
         int tempInt;
         for (Row row : sheet) {
@@ -117,6 +118,7 @@ public class hw1_test_code {
                 if (tempVal - tempInt == 0 && tempVal >= 0) {
                     state_list.put(row.getCell(0).getStringCellValue(), tempInt);
                     remainder_list.put(row.getCell(0).getStringCellValue(), (float) 0);
+                    reps_list.put(row.getCell(0).getStringCellValue(), 0);
                 }
             }
         }
@@ -144,6 +146,26 @@ public class hw1_test_code {
                     break;
                 }
             }
+        }
+    }
+    private static void huntingtonHillMethod(Hashtable<String, Integer> state_list, Hashtable<String, Float> remainder_list, Hashtable<String, Integer> reps_list, int totalRep, int allocatedRep){
+        for(String state : reps_list.keySet()) {
+            reps_list.put(state, 1);
+            remainder_list.put(state, (float) (state_list.get(state)/(Math.sqrt(reps_list.get(state)*(reps_list.get(state)+1)))));
+            allocatedRep++;
+        }
+        while (totalRep > allocatedRep) {
+            for (String state : reps_list.keySet()) {
+                if (Collections.max(remainder_list.values()).equals(remainder_list.get(state))) {
+                    allocatedRep++;
+                    reps_list.put(state, reps_list.get(state) + 1);
+                    remainder_list.put(state, (float) (state_list.get(state)/(Math.sqrt(reps_list.get(state)*(reps_list.get(state)+1)))));
+                    break;
+                }
+            }
+        }
+        for (String state : reps_list.keySet()) {
+            state_list.put(state, reps_list.get(state));
         }
     }
 
