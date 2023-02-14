@@ -30,8 +30,8 @@ public class hw1_test_code {
         //making an input to read csv file
         BufferedReader readFile;
         Hashtable<String, Integer> state_list = new Hashtable<>();
-        Hashtable<String, Float> remainder_list = new Hashtable<>();
-        Hashtable<String, Integer> reps_list = new Hashtable<>();
+        Hashtable<String, Float> value_list = new Hashtable<>();
+        Hashtable<String, Integer> rep_list = new Hashtable<>();
         try {
             String fileName = args[0];
             int totalRep;
@@ -66,11 +66,11 @@ public class hw1_test_code {
                 FileReader file = new FileReader(fileName);
                 readFile = new BufferedReader(file);
                 CSVParser parsedFile = CSVFormat.DEFAULT.withHeader().parse(readFile);
-                createHash_csv(parsedFile, state_list, remainder_list);
+                createHash_csv(parsedFile, state_list, value_list, rep_list);
             } else {
                 sheet = getSheet(fileName);
                 sheet.removeRow(sheet.getRow(0));
-                createHash_xlsx(state_list, remainder_list, sheet);
+                createHash_xlsx(state_list, value_list, rep_list, sheet);
             }
             // checking if provided reps are enough to allocate,
             if (totalRep < state_list.size()) {
@@ -84,10 +84,9 @@ public class hw1_test_code {
             float avgPopRep = totalPop / totalRep; //population per representative
             int allocatedRep = 0; //a variable to keep track of how many reps we allocated.
             if (hamilton) {
-                hamiltonMethod(state_list, remainder_list, totalRep, avgPopRep, allocatedRep);
+                hamiltonMethod(state_list, value_list, totalRep, avgPopRep, allocatedRep);
             } else {
-                huntingtonHillMethod(state_list, remainder_list, reps_list, totalRep, allocatedRep);
-
+                huntingtonHillMethod(state_list, value_list, rep_list, totalRep, allocatedRep);
             }
 
             //sorts the state_list and prints their respective representatives.
@@ -108,7 +107,7 @@ public class hw1_test_code {
         //-------------------------------------------------------------
     }
 
-    private static void createHash_xlsx(Hashtable<String, Integer> state_list, Hashtable<String, Float> remainder_list, Hashtable<String, Integer> reps_list, Sheet sheet) {
+    private static void createHash_xlsx(Hashtable<String, Integer> state_list, Hashtable<String, Float> value_list, Hashtable<String, Integer> rep_list, Sheet sheet) {
         float tempVal;
         int tempInt;
         for (Row row : sheet) {
@@ -117,21 +116,21 @@ public class hw1_test_code {
                 tempInt = (int) tempVal;
                 if (tempVal - tempInt == 0 && tempVal >= 0) {
                     state_list.put(row.getCell(0).getStringCellValue(), tempInt);
-                    remainder_list.put(row.getCell(0).getStringCellValue(), (float) 0);
-                    reps_list.put(row.getCell(0).getStringCellValue(), 0);
+                    value_list.put(row.getCell(0).getStringCellValue(), (float) 0);
+                    rep_list.put(row.getCell(0).getStringCellValue(), 0);
                 }
             }
         }
     }
 
-    private static void hamiltonMethod(Hashtable<String, Integer> state_list, Hashtable<String, Float> remainder_list, int totalRep, float avgPopRep, int allocatedRep) {
+    private static void hamiltonMethod(Hashtable<String, Integer> state_list, Hashtable<String, Float> value_list, int totalRep, float avgPopRep, int allocatedRep) {
         //found help at https://docs.oracle.com/javase/7/docs/api/java/util/Collections.html
         int flooredRepDivision;
         float repDivision;
         for (String state : state_list.keySet()) {
             repDivision = ((float) state_list.get(state)) / avgPopRep;
             flooredRepDivision = (int) Math.floor(repDivision);
-            remainder_list.put(state, repDivision - flooredRepDivision);
+            value_list.put(state, repDivision - flooredRepDivision);
             state_list.put(state, flooredRepDivision);
             allocatedRep += flooredRepDivision;
         }
@@ -139,39 +138,36 @@ public class hw1_test_code {
         while (totalRep > allocatedRep) {
             //find the largest remainder, give 1 rep to the corresponding state, repeat until out of reps
             for (String state : state_list.keySet()) {
-                if (Collections.max(remainder_list.values()).equals(remainder_list.get(state))) {
+                if (Collections.max(value_list.values()).equals(value_list.get(state))) {
                     allocatedRep++;
                     state_list.put(state, state_list.get(state) + 1);
-                    remainder_list.remove(state);
+                    value_list.remove(state);
                     break;
                 }
             }
         }
     }
-    private static void huntingtonHillMethod(Hashtable<String, Integer> state_list, Hashtable<String, Float> remainder_list, Hashtable<String, Integer> reps_list, int totalRep, int allocatedRep){
-        for(String state : reps_list.keySet()) {
-            reps_list.put(state, 1);
-            remainder_list.put(state, (float) (state_list.get(state)/(Math.sqrt(reps_list.get(state)*(reps_list.get(state)+1)))));
+    private static void huntingtonHillMethod(Hashtable<String, Integer> state_list, Hashtable<String, Float> value_list, Hashtable<String, Integer> rep_list, int totalRep, int allocatedRep){
+        for(String state : rep_list.keySet()) {
+            rep_list.put(state, 1);
+            value_list.put(state, (float) (state_list.get(state)/(Math.sqrt(rep_list.get(state)*(rep_list.get(state)+1)))));
             allocatedRep++;
         }
         while (totalRep > allocatedRep) {
-            for (String state : reps_list.keySet()) {
-                if (Collections.max(remainder_list.values()).equals(remainder_list.get(state))) {
+            for (String state : rep_list.keySet()) {
+                if (Collections.max(value_list.values()).equals(value_list.get(state))) {
                     allocatedRep++;
-                    reps_list.put(state, reps_list.get(state) + 1);
-                    remainder_list.put(state, (float) (state_list.get(state)/(Math.sqrt(reps_list.get(state)*(reps_list.get(state)+1)))));
+                    rep_list.put(state, rep_list.get(state) + 1);
+                    value_list.put(state, (float) (state_list.get(state)/(Math.sqrt(rep_list.get(state)*(rep_list.get(state)+1)))));
                     break;
                 }
             }
         }
-        for (String state : reps_list.keySet()) {
-            state_list.put(state, reps_list.get(state));
+        for (String state : rep_list.keySet()) {
+            state_list.put(state, rep_list.get(state));
         }
     }
 
-    //private static void huntingtonHillMethod(Hashtable<String, Integer> state_list, Hashtable<String, Float> remainder_list, int totalRep, float avgPopRep, int allocatedRep) {
-
-    //}
 
     private static void output(Hashtable<String, Integer> state_list) {
         List<String> states = new ArrayList<>(state_list.keySet());
@@ -197,7 +193,7 @@ public class hw1_test_code {
         }
     }
 
-    public static void createHash_csv(CSVParser parsedFile, Hashtable<String, Integer> state_list, Hashtable<String, Float> remainder_list) throws ParseException {
+    public static void createHash_csv(CSVParser parsedFile, Hashtable<String, Integer> state_list, Hashtable<String, Float> value_list, Hashtable<String, Integer> rep_list) throws ParseException {
         float tempVal;
         int tempInt;
         for (CSVRecord record : parsedFile) {
@@ -206,7 +202,8 @@ public class hw1_test_code {
                 tempInt = (int) tempVal;
                 if (tempVal - tempInt == 0 && tempVal >= 0) {
                     state_list.put(record.values()[0], tempInt);
-                    remainder_list.put(record.values()[0], (float) 0);
+                    value_list.put(record.values()[0], (float) 0);
+                    rep_list.put(record.values()[0], 0);
                 }
             }
         }
