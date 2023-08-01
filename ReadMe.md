@@ -1,10 +1,8 @@
-# HW1C
-Final Submission: (02/14/2023 7:24pm ET)
 ## Authors
 
-* Pranav Ramkumar - vej8jz
-* Christopher Joseph - tbh7cm
-* Ryan Quiram - zhe5qq
+* Pranav Ramkumar
+* Christopher Joseph
+* Ryan Quiram
 
 ## Description
 
